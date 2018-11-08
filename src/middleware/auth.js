@@ -2,65 +2,70 @@
 
 import User from '../userApi/user-model.js';
 
-export default (req, res, next) => {
+export default (capability) => {
 
-  let authenticate = (auth) => {
+  return (req, res, next) => {
 
-    // Validate the user using the model's authenticate method
-    User.authenticate(auth)
-      .then(user => {
-        if (!user) {
-          getAuth();
-        } else {
-          req.token = user.generateToken();
-          next();
-        }
-      })
-      .catch(next);
+    try {
 
-  };
+      console.log('auth header', req.headers.authorization);
 
-  // If we're not authenticated either show an error or pop a window
-  let getAuth = () => {
+      let [authType, authString] = req.headers.authorization.split(/\s+/);
 
-    /* TODO: Explore later
-    Explore this code after completing lab
-     Sending this out, will show the annoying pop-up window in the browser
-     While useless IRL, it's fun to play with this and see how you can login with a browser
-    res.set({
-      'WWW-Authenticate': 'Basic realm="Super Secret Area"'
-    }).send(401);
+      console.log('auth info', authType, authString);
 
-    For our actual purposes, though, send back a JSON formatted error object through our middleware
-    */
+      // BASIC Auth  ... Authorization:Basic ZnJlZDpzYW1wbGU=
+      // BEARER Auth ... Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI
 
-    next({ status: 401, statusMessage: 'Unauthorized', message: 'Invalid User ID/Password' });
-  };
+      // FIXME: The linter was going nuts about the switch case indentation.
+      switch (authType.toLowerCase()) {
+        case 'basic': return _authBasic(authString); // eslint-disable-line
+        case 'bearer': return _authBearer(authString);// eslint-disable-line
+        default: return _authError(); // eslint-disable-line
+      }
 
-  // Try to authenticate -- parse out the headers and do some work!
-  try {
-    let auth = {};
-    let authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-      return getAuth();
+    } catch (error) {
+      return _authError();
     }
 
-    // BASIC Auth
-    if (authHeader.match(/basic/i)) {
-      // SAMPLE BASIC: Basic ZnJlZDpzYW1wbGU=
-      // Break that apart ...
-      let base64Header = authHeader.replace(/Basic\s+/i, ''); // ZnJlZDpzYW1wbGU=
-      let base64Buffer = Buffer.from(base64Header, 'base64'); // <Buffer 01 02...>
+    function _authBasic(authString) {
+      let base64Buffer = Buffer.from(authString, 'base64'); // <Buffer 01 02...>
       let bufferString = base64Buffer.toString(); // john:mysecret
-      let [username, password] = bufferString.split(':');  // variables username="john" and password="mysecret"
-      auth = { username, password };  // {username:"john", password:"mysecret"}
+      let [username, password] = bufferString.split(':'); // variables username="john" and password="mysecret"
+      let auth = {
+        username,
+        password,
+      }; // {username:"john", password:"mysecret"}
 
-      // Start the authentication train
-      authenticate(auth);
+      console.log('user info', auth);
+
+      return User.authenticateBasic(auth)
+        .then(user => _authenticate(user));
     }
-  } catch (e) {
-    next(e);
-  }
+
+    function _authBearer(authString) {
+      return User.authenticateToken(authString)
+        .then(user => _authenticate(user));
+    }
+
+    function _authenticate(user) {
+      if (user && (!capability || (user.can(capability)))) {
+        req.user = user;
+        req.token = user.generateToken();
+        next();
+      } else {
+        _authError();
+      }
+    }
+
+    function _authError() {
+      next({
+        status: 401,
+        statusMessage: 'Unauthorized',
+        message: 'Invalid User ID/Password',
+      });
+    }
+
+  };
 
 };
