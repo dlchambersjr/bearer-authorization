@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 // Load mongoose to work with mongo
 import mongoose, { Schema } from 'mongoose';
 
@@ -40,11 +42,14 @@ userSchema.methods.can = function (capability) {
 
 // Create a JSON Token from the user id and a password
 userSchema.methods.generateToken = function () {
+  console.log(this);
   let tokenData = {
     id: this._id,
     capabilities: capabilities[this.role],
   };
-  return jwt.sign(tokenData, process.env.APP_SECRET);
+
+  // FIXME: dotenv not passing process.env.APP_SECRET value - use temp string
+  return jwt.sign(tokenData, 'SECRET');
 };
 
 // Compare a plain text password against the hashed one on file
