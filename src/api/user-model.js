@@ -25,14 +25,13 @@ const capabilities = {
 };
 
 // create the pre methods
-userSchema.pre('save', function (next) {
-  bcrypt.hash(this.password, 10)
-    .then(hashedPassword => {
-      this.password = hashedPassword;
-      next();
-    })
-    .catch(error => { throw error; });
+userSchema.pre('save', async function (next) {
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+  } catch (error) { throw error; }
 });
+
 
 // Verify users role on ACL
 userSchema.methods.can = function (capability) {
@@ -45,13 +44,18 @@ userSchema.methods.generateToken = function () {
     id: this._id,
     capabilities: capabilities[this.role],
   };
-  return jwt.sign(tokenData, process.env.SECRET);
+  return jwt.sign(tokenData, process.env.APP_SECRET);
 };
 
 // Compare a plain text password against the hashed one on file
-userSchema.methods.comparePassword = function (password) {
-  return bcrypt.compare(password, this.password)
-    .then(valid => valid ? this : null);
+userSchema.methods.comparePassword = async function (password) {
+
+  try {
+    const valid = await bcrypt.compare(password, this.password);
+
+    return (valid ? this : null);
+  } catch (error) { throw error; }
+
 };
 
 userSchema.statics.authenticateBasic = function (auth) {

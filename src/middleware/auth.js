@@ -1,6 +1,6 @@
 'use strict';
 
-import User from '../userApi/user-model.js';
+import User from '../api/user-model.js';
 
 export default (capability) => {
 

@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import { startDB, stopDB } from './supergoose.js';
+
 import User from '../src/api/user-model.js';
 
 beforeAll(startDB);
@@ -30,7 +31,6 @@ describe('Test the User Model', () => {
   it('should find a user', async () => {
 
     const user = await createUser();
-
     const foundUser = await User.findById(user._id);
 
     expect(foundUser.username).toBe(user.username);
@@ -41,9 +41,7 @@ describe('Test the User Model', () => {
   it('should fail if username is missing', async () => {
 
     try {
-
       await createUser(null);
-
     } catch (err) {
 
       expect(err.message).toEqual(expect.stringContaining('Users validation failed: username'));
@@ -55,13 +53,10 @@ describe('Test the User Model', () => {
   it('should fail if email is missing', async () => {
 
     try {
-
       await createUser(undefined, null);
-
     } catch (err) {
 
       expect(err.message).toEqual(expect.stringContaining('Users validation failed: email'));
-
     }
 
   });
@@ -69,13 +64,10 @@ describe('Test the User Model', () => {
   it('should fail if password is missing', async () => {
 
     try {
-
       await createUser(undefined, undefined, null);
-
     } catch (err) {
 
       expect(err.message).toEqual(expect.stringContaining('Users validation failed: password'));
-
     }
 
   });
@@ -85,13 +77,10 @@ describe('Test the User Model', () => {
     await createUser();
 
     try {
-
       await createUser(undefined, undefined, 'foobar');
-
     } catch (err) {
 
       expect(err.message).toEqual(expect.stringContaining('E11000 duplicate key error dup key'));
-
     }
 
   });

@@ -9,7 +9,6 @@ describe('Test Hashing Module', () => {
 
     const hashedPass = bcrypt.hash(password);
 
-    console.log(hashedPass);
     const matchedPass = bcrypt.compare(password, hashedPass);
 
     expect(matchedPass).toBeTruthy();
