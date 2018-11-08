@@ -14,8 +14,3 @@ beforeEach(async () => {
 afterEach(async () => {
   //clear test data
 });
-
-describe('DUMMY TEST', () => {
-
-
-});

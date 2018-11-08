@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 import { startDB, stopDB } from './supergoose.js';
-import User from '../src/userApi/user-model.js';
+import User from '../src/api/user-model.js';
 
 beforeAll(startDB);
 afterAll(stopDB);
