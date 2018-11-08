@@ -1,33 +1,23 @@
+// Load express and Router
 import express from 'express';
+const router = express.Router();
+
 import User from './user-model.js';
 import auth from '../middleware/auth.js';
 
-// import { create } from 'domain';
-// import { createUnzip } from 'zlib';
-// import { createSecureServer } from 'http2';
-
-const router = express.Router();
-
-router.get('/signin', auth, (req, res) => {
-
-  res.send(req.token);
-
+// These routes should support a redirect instead of just spitting out the token ...
+router.post('/signup', (req, res, next) => {
+  let user = new User(req.body);
+  user.save()
+    .then((user) => {
+      req.token = user.generateToken();
+      req.user = user;
+      res.send(req.token);
+    }).catch(next);
 });
 
-//Add users via signup.
-router.post('/signup', async (req, res) => {
-
-  const body = req.body;
-
-  try {
-    const user = await User.create(body);
-    const token = user.generateToken();
-    res.send(token);
-
-  } catch (error) {
-    res.sendStatus(400);
-  }
-
+router.post('/signin', auth(), (req, res) => {
+  res.send(req.token);
 });
 
 export default router;

@@ -16,15 +16,6 @@ const models = {
 
 const router = express.Router();
 
-// Process successful results and return the body
-let sendJSON = (data, response) => {
-  response.statusCode = 200;
-  response.statusMessage = 'OK';
-  response.setHeader('Content-Type', 'application/json');
-  response.write(JSON.stringify(data));
-  response.end();
-};
-
 // GET ROUTE(S)
 //returns all documents if no id provided
 router.get('/api/v1/:model', (req, res, next) => {
@@ -135,5 +126,15 @@ router.delete('/api/v1/:model/:id', (req, res, next) => {
 
 export default router;
 
-
+/* Stretch goal: add the below routes and get them to work 
+app.get('/', auth(), (req,res) => {
+  res.send('hi from /');
+});
+app.get('/s', auth('create'), (req,res) => {
+  res.send('hi from /s');
+});
+app.get('/d', auth('delete'), (req,res) => {
+  res.send('hi from /d');
+});
+*/
 
