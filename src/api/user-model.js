@@ -1,4 +1,5 @@
-require('dotenv').config();
+// require('dotenv').config();
+
 
 // Load mongoose to work with mongo
 import mongoose, { Schema } from 'mongoose';
@@ -49,7 +50,7 @@ userSchema.methods.generateToken = function () {
   };
 
   // FIXME: dotenv not passing process.env.APP_SECRET value - use temp string
-  return jwt.sign(tokenData, 'SECRET');
+  return jwt.sign(tokenData, process.env.APP_SECRET);
 };
 
 // Compare a plain text password against the hashed one on file

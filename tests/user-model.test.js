@@ -96,7 +96,7 @@ describe('Test the User Model', () => {
 
   });
 
-  xit('should match a good password', async () => {
+  it('should match a good password', async () => {
 
     const password = 'testPassword';
 
@@ -108,7 +108,7 @@ describe('Test the User Model', () => {
 
   });
 
-  xit('should not match bad password', async () => {
+  it('should not match bad password', async () => {
 
     const user = await createUser();
 
@@ -118,7 +118,7 @@ describe('Test the User Model', () => {
   });
 
 
-  xit('should authenticate if credientials match', async () => {
+  it('should authenticate if credientials match', async () => {
 
     await createUser();
 
