@@ -13,7 +13,10 @@ router.post('/signup', (req, res, next) => {
       req.token = user.generateToken();
       req.user = user;
       res.send(req.token);
-    }).catch(next);
+    }).catch(error => {
+      const err = { status: 400, statusMessage: 'Bad Request' };
+      next(err);
+    });
 });
 
 router.post('/signin', auth(), (req, res) => {

@@ -19,7 +19,7 @@ afterEach(async () => {
 
 describe('Test the API', () => {
 
-  xit('should return 404 not found with a bad route', async () => {
+  it('should return 404 not found with a bad route', async () => {
 
     const response =
       await mockRequest.post('/signups')
@@ -28,7 +28,7 @@ describe('Test the API', () => {
     expect(response.status).toBe(404);
   });
 
-  xit('should signup a user with good credentials', async () => {
+  it('should signup a user with good credentials', async () => {
 
     const response =
       await mockRequest.post('/signup')
@@ -38,41 +38,69 @@ describe('Test the API', () => {
     expect(response.status).toBe(200);
   });
 
-  xit('should NOT signup a user with BAD/incomplete credentials', async () => {
+  it('should NOT signup a user with BAD/incomplete credentials', async () => {
 
     const userInfo = { username: 'foo', email: 'foo@bar.com' };
 
     const response = await mockRequest.post('/signup').send(userInfo);
 
     expect(response.status).toBe(400);
+    expect(response.res.statusMessage).toBe('Bad Request');
 
 
   });
 
-  xit('should allow a valid USER to sign in.', async () => {
+  it('should allow a valid USER to sign in with Basic Auth.', async () => {
 
     const userInfo = { username: 'foo', email: 'foo@bar.com', password: 'foobar' };
 
     await mockRequest.post('/signup').send(userInfo);
 
-    const response = await mockRequest.get('/signin').auth('foo', 'foobar');
+    const response = await mockRequest.post('/signin').auth('foo', 'foobar');
 
     expect(response.text.split('.').length).toBe(3);
     expect(response.status).toBe(200);
   });
 
-  xit('should NOT allow an invalid USER to sign in.', async () => {
+  it('should NOT allow an invalid USER to sign in with Basic Auth.', async () => {
 
     const userInfo = { username: 'foo', email: 'foo@bar.com', password: 'foobar' };
 
     await mockRequest.post('/signup').send(userInfo);
 
-    const response = await mockRequest.get('/signin').auth('foobar', 'barfoo');
+    const response = await mockRequest.post('/signin').auth('foobar', 'barfoo');
 
     expect(response.status).toBe(401);
-
     expect(response.res.statusMessage).toBe('Unauthorized');
 
   });
 
+  it('should allow a VALID user to sign in with BEARER Auth.', async () => {
+
+    const userInfo = { username: 'foo', email: 'foo@bar.com', password: 'foobar' };
+
+    const signUpRes = await mockRequest.post('/signup').send(userInfo);
+
+    const signInRes = await mockRequest.post('/signin').auth(signUpRes.token);
+
+    expect(signInRes.text.split('.').length).toBe(3);
+    expect(signInRes.status).toBe(200);
+
+  });
 });
+
+
+
+xit('should NOT allow an INVALID user to sign in with BEARER Auth.', async () => {
+
+  const userInfo = { username: 'foo', email: 'foo@bar.com', password: 'foobar' };
+
+  await mockRequest.post('/signup').send(userInfo);
+
+  const response = await mockRequest.post('/signin').auth('foobar', 'barfoo');
+
+  expect(response.status).toBe(401);
+  expect(response.res.statusMessage).toBe('Unauthorized');
+
+});
+

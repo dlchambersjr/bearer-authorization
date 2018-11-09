@@ -138,6 +138,7 @@ describe('Test the User Model', () => {
 
   });
 
+
   it('should authenticate a GOOD USER token', async () => {
 
     const user = await createUser();
@@ -158,4 +159,12 @@ describe('Test the User Model', () => {
       .catch(error => { expect(error).toBeDefined(); });
 
   });
+
+
+
+
+
+
+
+
 });
