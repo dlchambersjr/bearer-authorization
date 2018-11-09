@@ -43,13 +43,13 @@ userSchema.methods.can = function (capability) {
 
 // Create a JSON Token from the user id and a password
 userSchema.methods.generateToken = function () {
-  console.log(this);
   let tokenData = {
     id: this._id,
     capabilities: capabilities[this.role],
   };
 
-  // FIXME: dotenv not passing process.env.APP_SECRET value - use temp string
+  // FIXME: dotenv not passing process.env.APP_SECRET value for tests.  Using 'SECRET' for tests only.
+
   return jwt.sign(tokenData, process.env.APP_SECRET);
 };
 
@@ -58,29 +58,39 @@ userSchema.methods.comparePassword = async function (password) {
 
   try {
     const valid = await bcrypt.compare(password, this.password);
-
     return (valid ? this : null);
+
   } catch (error) { throw error; }
 
 };
 
-userSchema.statics.authenticateBasic = function (auth) {
+userSchema.statics.authenticateBasic = async function (auth) {
   let query = { username: auth.username };
-  return this.findOne(query)
-    .then(user => user && user.comparePassword(auth.password))
-    .catch(console.error);
+
+  try {
+    const user = await this.findOne(query);
+    return (user && user.comparePassword(auth.password));
+
+  } catch (error) { throw error; }
+
 };
 
 
 // Validate the a token if that was sent
 userSchema.statics.authenticateToken = function (token) {
-  let parsedToken = jwt.verify(token, process.env.SECRET);
-  let query = { _id: parsedToken.id };
-  return this.findOne(query)
-    .then(user => {
-      return user;
-    })
-    .catch(error => error);
+
+  // FIXME: dotenv not passing process.env.APP_SECRET value for tests.  Using 'SECRET' for tests only.
+  try {
+    let parsedToken = jwt.verify(token, process.env.APP_SECRET);
+
+    let query = { _id: parsedToken.id };
+
+    return this.findOne(query)
+      .then(user => { return user; })
+      .catch(error => error);
+
+  } catch (error) { throw error; }
+
 };
 
 export default mongoose.model('Users', userSchema);

@@ -27,6 +27,7 @@ module.exports = function (wallaby) {
     },
 
     setup: function () {
+      require('dotenv').config();
       require('babel-core');
     },
 
