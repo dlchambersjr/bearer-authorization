@@ -7,6 +7,7 @@ import auth from '../middleware/auth.js';
 
 // These routes should support a redirect instead of just spitting out the token ...
 router.post('/signup', (req, res, next) => {
+
   let user = new User(req.body);
   user.save()
     .then((user) => {
@@ -20,6 +21,9 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.post('/signin', auth(), (req, res) => {
+  console.log(`\n\n===============`, req.headers);
+  console.log(req.headers.authorization);
+
   res.send(req.token);
 });
 

@@ -10,11 +10,6 @@ export default (capability) => {
 
       let [authType, authString] = req.headers.authorization.split(/\s+/);
 
-      console.log(authType, authString);
-
-      // BASIC Auth  ... Authorization:Basic ZnJlZDpzYW1wbGU=
-      // BEARER Auth ... Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI
-
       // FIXME: added eslint-disable-line below because the linter was complaining about the indentation for the switch case
 
       switch (authType.toLowerCase()) {
