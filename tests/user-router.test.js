@@ -81,9 +81,13 @@ describe('Test the API', () => {
 
     const signUpRes = await mockRequest.post('/signup').send(userInfo);
 
-    const signInRes = await mockRequest.post('/signin').auth(signUpRes.token);
+    console.log(signUpRes.text);
 
-    expect(signInRes.text.split('.').length).toBe(3);
+    const signInRes = await mockRequest.post('/signin').auth(signUpRes.text);
+
+    console.log(signUpRes.text);
+
+    expect(signInRes.text).toEqual(signUpRes.text);
     expect(signInRes.status).toBe(200);
 
   });
