@@ -3,6 +3,7 @@ import express from 'express';
 
 // Load local middleware
 import userRouter from './api/user-router.js';
+// import booksRouter from './api/books-router';
 
 import authRouter from './middleware/auth.js';
 import notFound from './middleware/404.js';
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Process incoming through the routers
 app.use(userRouter);
+// app.use(booksRouter);
 
 //use local middleware
 app.use(notFound);
