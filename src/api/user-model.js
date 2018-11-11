@@ -1,6 +1,5 @@
 // require('dotenv').config();
 
-
 // Load mongoose to work with mongo
 import mongoose, { Schema } from 'mongoose';
 
@@ -14,7 +13,7 @@ import jwt from 'jsonwebtoken';
 const userSchema = new Schema({
 
   username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, default: 'user@email.com', unique: true },
+  email: { type: String, unique: true },
   password: { type: String, required: true },
   role: { type: String, required: true, default: 'user', enum: ['admin', 'editor', 'user'] },
 
