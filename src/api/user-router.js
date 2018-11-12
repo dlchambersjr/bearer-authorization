@@ -39,10 +39,10 @@ router.post('/signin', auth(), (req, res) => {
 
 // GET ROUTE(S)
 //returns all documents if no id provided
-router.get('/api/v1/:model', auth(), (req, res, next) => {
+router.get('/api/v1/:model', auth('read'), (req, res, next) => {
   const model = models[req.params.model];
   if (!model) {
-    const err = { status: 400, statusMessage: 'Bad Request' };
+    const err = { status: 404, statusMessage: 'NOT FOUND' };
     next(err);
     return;
   }
@@ -53,17 +53,19 @@ router.get('/api/v1/:model', auth(), (req, res, next) => {
 });
 
 //returns a specific id
-router.get('/api/v1/:model/:id', auth(), (req, res) => {
+router.get('/api/v1/:model/:id', auth('read'), (req, res, next) => {
   const model = models[req.params.model];
   const id = req.params.id;
 
   if (!model) {
-    // FIXME: errorHandler('model not found', req, res);
+    const err = { status: 404, statusMessage: 'NOT FOUND' };
+    next(err);
     return;
   }
 
   if (!id) {
-    // FIXME: errorHandler('bad request', req, res);
+    const err = { status: 400, statusMessage: 'Bad Request' };
+    next(err);
     return;
   } else {
     model.findById({ _id: id }).populate('author')
@@ -74,7 +76,7 @@ router.get('/api/v1/:model/:id', auth(), (req, res) => {
 });
 
 // POST ROUTE
-router.post('/api/v1/:model', auth('edit'), (req, res, next) => {
+router.post('/api/v1/:model', auth('create'), (req, res, next) => {
   const model = models[req.params.model];
   const body = req.body;
   const authorInfo = {};
@@ -111,7 +113,7 @@ router.post('/api/v1/:model', auth('edit'), (req, res, next) => {
 });
 
 // PUT ROUTE
-router.put('/api/v1/:model/:id', (req, res, next) => {
+router.put('/api/v1/:model/:id', auth('update'), (req, res, next) => {
   const model = models[req.params.model];
   const id = req.params.id;
   const body = req.body;
@@ -132,7 +134,7 @@ router.put('/api/v1/:model/:id', (req, res, next) => {
 // TODO: I'm not sure I fully understand the differnece between PUT and PATCH:
 
 // PATCH ROUTE
-router.patch('/api/v1/:model/:id', auth(), (req, res, next) => {
+router.patch('/api/v1/:model/:id', auth('update'), (req, res, next) => {
 
   const model = models[req.params.model];
   const id = req.params.id;
@@ -153,7 +155,7 @@ router.patch('/api/v1/:model/:id', auth(), (req, res, next) => {
 });
 
 // DELETE ROUTE
-router.delete('/api/v1/:model/:id', auth('admin'), (req, res, next) => {
+router.delete('/api/v1/:model/:id', auth('delete'), (req, res, next) => {
   const model = models[req.params.model];
   const id = req.params.id;
 
