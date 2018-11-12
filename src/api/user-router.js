@@ -62,18 +62,13 @@ router.get('/api/v1/:model/:id', auth('read'), (req, res, next) => {
     return;
   }
 
-  if (!id) {
-    const err = { status: 400, statusMessage: 'Bad Request' };
-    next(err);
-    return;
-  } else {
-    model.findById({ _id: id }).populate('author')
-      .then(book => sendJSON(book, res))
-      .catch(error => {
-        const err = { status: 404, statusMessage: 'NOT FOUND' };
-        next(err);
-      });
-  }
+  model.findById({ _id: id }).populate('author')
+    .then(book => sendJSON(book, res))
+    .catch(error => {
+      const err = { status: 404, statusMessage: 'NOT FOUND' };
+      next(err);
+    });
+
 
 });
 
@@ -84,17 +79,11 @@ router.post('/api/v1/:model', auth('create'), (req, res, next) => {
   const authorInfo = {};
   authorInfo.name = body.author;
 
-  if (!model) {
-    const err = { status: 400, statusMessage: 'Bad Request' };
-    next(err);
-    return;
-  }
-
   Author.create(authorInfo)
     .then(author => {
       const bookInfo = Object.assign({}, body, { author: author._id });
 
-      Book.create(bookInfo)
+      model.create(bookInfo)
         .then(result => {
           Book.findById({ _id: result._id }).populate('author')
             .then(newBook => sendJSON(newBook, res));
@@ -106,8 +95,7 @@ router.post('/api/v1/:model', auth('create'), (req, res, next) => {
 });
 
 // PUT ROUTE
-router.put('/api/v1/:model/:id', auth('update'), (req, res, next) => {
-  const model = models[req.params.model];
+router.put('/api/v1/books/:id', auth('update'), (req, res, next) => {
   const id = req.params.id;
   const body = req.body;
 
@@ -118,16 +106,10 @@ router.put('/api/v1/:model/:id', auth('update'), (req, res, next) => {
     new: true,
   };
 
-  if (!model) {
-    const err = { status: 404, statusMessage: 'NOT FOUND' };
-    next(err);
-    return;
-  }
-
   Author.findOne(authorInfo)
     .then(author => {
       const bookInfo = Object.assign({}, body, { author: author._id });
-      model.findByIdAndUpdate(id, bookInfo, updateOptions).populate('author')
+      Book.findByIdAndUpdate(id, bookInfo, updateOptions).populate('author')
         .then(result => sendJSON(result, res))
         .catch(next);
     });
@@ -163,17 +145,10 @@ router.patch('/api/v1/:model/:id', auth('update'), (req, res, next) => {
 });
 
 // DELETE ROUTE
-router.delete('/api/v1/:model/:id', auth('delete'), (req, res, next) => {
-  const model = models[req.params.model];
+router.delete('/api/v1/books/:id', auth('delete'), (req, res, next) => {
   const id = req.params.id;
 
-  if (!model) {
-    const err = { status: 404, statusMessage: 'NOT FOUND' };
-    next(err);
-    return;
-  }
-
-  model.findByIdAndDelete(id)
+  Book.findByIdAndDelete(id)
     .then(result => {
       result = { deleteRequest: 'completed' };
       sendJSON(result, res);

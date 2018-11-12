@@ -17,7 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 // Process incoming through the routers
 app.use(userRouter);
 
-
 //use local middleware
 app.use(notFound);
 app.use(authRouter);
