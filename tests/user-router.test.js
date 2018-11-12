@@ -93,10 +93,6 @@ describe('Test the API', () => {
 
   it('should NOT allow an INVALID user to sign in with BEARER Auth.', async () => {
 
-    const userInfo = { username: 'foo', email: 'foo@bar.com', password: 'foobar' };
-
-    const signUpRes = await mockRequest.post('/signup').send(userInfo);
-
     const signInRes =
       await mockRequest.post('/signin')
         .set('Authorization', `bad 12345`);

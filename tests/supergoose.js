@@ -1,3 +1,4 @@
+global.jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 /**
  * Combines SuperTest and Mongoose Memory Server
  * to reduce (hopefully) the pain of 
