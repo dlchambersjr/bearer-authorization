@@ -69,8 +69,11 @@ router.get('/api/v1/:model/:id', auth('read'), (req, res, next) => {
     return;
   } else {
     model.findById({ _id: id }).populate('author')
-      .then(book => sendJSON(book, res));
-    // FIXME: .catch(next);
+      .then(book => sendJSON(book, res))
+      .catch(error => {
+        const err = { status: 404, statusMessage: 'NOT FOUND' };
+        next(err);
+      });
   }
 
 });
@@ -94,22 +97,15 @@ router.post('/api/v1/:model', auth('create'), (req, res, next) => {
     .then(author => {
       const bookInfo = Object.assign({}, body, { author: author._id });
 
-      console.log(bookInfo);
-
       Book.create(bookInfo)
         .then(result => {
-          console.log(result);
-          const newBook = Book.findById({ _id: result._id }).populate('author');
-          console.log(newBook.schema);
-          sendJSON(result, res);
+          Book.findById({ _id: result._id }).populate('author')
+            .then(newBook => sendJSON(newBook, res));
+
         })
         .catch(next);
     })
     .catch(next);
-
-
-
-
 });
 
 // PUT ROUTE
@@ -117,21 +113,29 @@ router.put('/api/v1/:model/:id', auth('update'), (req, res, next) => {
   const model = models[req.params.model];
   const id = req.params.id;
   const body = req.body;
+
+  const authorInfo = {};
+  authorInfo.name = body.author;
+
   const updateOptions = {
     new: true,
   };
 
   if (!model) {
-    // FIXME: errorHandler('model not found', req, res, next);
+    const err = { status: 404, statusMessage: 'NOT FOUND' };
+    next(err);
     return;
   }
 
-  model.findByIdAndUpdate(id, body, updateOptions)
-    .then(result => sendJSON(result, res))
-    .catch(next);
+  Author.findOne(authorInfo)
+    .then(author => {
+      const bookInfo = Object.assign({}, body, { author: author._id });
+      model.findByIdAndUpdate(id, bookInfo, updateOptions).populate('author')
+        .then(result => sendJSON(result, res))
+        .catch(next);
+    });
 });
 
-// TODO: I'm not sure I fully understand the differnece between PUT and PATCH:
 
 // PATCH ROUTE
 router.patch('/api/v1/:model/:id', auth('update'), (req, res, next) => {
@@ -139,20 +143,29 @@ router.patch('/api/v1/:model/:id', auth('update'), (req, res, next) => {
   const model = models[req.params.model];
   const id = req.params.id;
   const body = req.body;
+
+  const authorInfo = {};
+  authorInfo.name = body.author;
+
   const updateOptions = {
     new: true,
   };
 
   if (!model) {
-    // FIXME: errorHandler('model not found', req, res, next);
+    const err = { status: 404, statusMessage: 'NOT FOUND' };
+    next(err);
     return;
   }
 
-  model.findByIdAndUpdate(id, body, updateOptions)
-    .then(result => sendJSON(result, res))
-    .catch(next);
-
+  Author.findOne(authorInfo)
+    .then(author => {
+      const bookInfo = Object.assign({}, body, { author: author._id });
+      model.findByIdAndUpdate(id, bookInfo, updateOptions).populate('author')
+        .then(result => sendJSON(result, res))
+        .catch(next);
+    });
 });
+
 
 // DELETE ROUTE
 router.delete('/api/v1/:model/:id', auth('delete'), (req, res, next) => {
@@ -160,12 +173,16 @@ router.delete('/api/v1/:model/:id', auth('delete'), (req, res, next) => {
   const id = req.params.id;
 
   if (!model) {
-    // FIXME: errorHandler('model not found', req, res, next);
+    const err = { status: 404, statusMessage: 'NOT FOUND' };
+    next(err);
     return;
   }
 
   model.findByIdAndDelete(id)
-    .then(result => sendJSON(result, res))
+    .then(result => {
+      result = { deleteRequest: 'completed' };
+      sendJSON(result, res);
+    })
     .catch(next);
 });
 
