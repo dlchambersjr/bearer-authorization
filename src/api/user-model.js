@@ -47,10 +47,7 @@ userSchema.methods.generateToken = function () {
     capabilities: capabilities[this.role],
   };
 
-  // FIXME: dotenv not passing process.env.APP_SECRET value for tests.  Using 'SECRET' for tests only.
-
-  // return jwt.sign(tokenData, process.env.APP_SECRET);
-  return jwt.sign(tokenData, 'SECRET');
+  return jwt.sign(tokenData, process.env.APP_SECRET);
 };
 
 // Compare a plain text password against the hashed one on file
@@ -79,10 +76,8 @@ userSchema.statics.authenticateBasic = async function (auth) {
 // Validate the a token if that was sent
 userSchema.statics.authenticateToken = function (token) {
 
-  // FIXME: dotenv not passing process.env.APP_SECRET value for tests.  Using 'SECRET' for tests only.
   try {
-    // let parsedToken = jwt.verify(token, process.env.APP_SECRET);
-    let parsedToken = jwt.verify(token, 'SECRET');
+    let parsedToken = jwt.verify(token, process.env.APP_SECRET);
 
     let query = { _id: parsedToken.id };
 
