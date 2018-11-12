@@ -17,7 +17,6 @@ const models = {
   'author': Author,
 };
 
-
 // TODO: Revist this - the best way to process this would actually be with a res.redirect and a cookie.
 router.post('/signup', (req, res, next) => {
 
@@ -85,8 +84,6 @@ router.post('/api/v1/:model', auth('create'), (req, res, next) => {
   const authorInfo = {};
   authorInfo.name = body.author;
 
-  console.log(authorInfo);
-
   if (!model) {
     const err = { status: 400, statusMessage: 'Bad Request' };
     next(err);
@@ -136,7 +133,6 @@ router.put('/api/v1/:model/:id', auth('update'), (req, res, next) => {
     });
 });
 
-
 // PATCH ROUTE
 router.patch('/api/v1/:model/:id', auth('update'), (req, res, next) => {
 
@@ -166,7 +162,6 @@ router.patch('/api/v1/:model/:id', auth('update'), (req, res, next) => {
     });
 });
 
-
 // DELETE ROUTE
 router.delete('/api/v1/:model/:id', auth('delete'), (req, res, next) => {
   const model = models[req.params.model];
@@ -185,12 +180,5 @@ router.delete('/api/v1/:model/:id', auth('delete'), (req, res, next) => {
     })
     .catch(next);
 });
-
-
-
-
-
-
-
 
 export default router;
