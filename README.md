@@ -1,4 +1,4 @@
-# Lab-16 ```Basic Authorization```
+# Lab-18 ```Bearer Authentication```
 
 ## Installation
 
@@ -34,13 +34,20 @@
 * index.js - entry point for server
 * server.js - primary server code
 * user-model.js - user model for Mongo Data Structure
-* user-router.js - API Routes for user model.
+* user-router.js - API Routes.
+* books-model.js - Data model for books.
+* author-model.js - Data model for authors.
 
 ## Local Middleware
 * 404.js - HTTP 404 Route Not Found handler
-* auth.js - Basic user authenticator
+* auth.js - Basic and Bearer user authenticator
 * error.js - Error handler for non HTTP repsonse code errors.
 * hashing.js - Custom hash generator to replace non-functioning bcrypt.
+* sendJSON.js - Returns status codes and converts JSON for response.write.
+
+## Testing
+* All test pass 100%
+* 90.16% Coverage
 
 
 

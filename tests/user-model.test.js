@@ -80,7 +80,7 @@ describe('Test the User Model', () => {
       await createUser(undefined, undefined, 'foobar');
     } catch (err) {
 
-      expect(err.message).toEqual(expect.stringContaining('E11000 duplicate key error dup key'));
+      expect(err.message).toEqual(expect.stringContaining('E11000 duplicate key error'));
     }
 
   });
@@ -122,22 +122,49 @@ describe('Test the User Model', () => {
 
     await createUser();
 
-    const user = await User.authenticate({ username: 'foo', password: 'foobar' });
+    const user = await User.authenticateBasic({ username: 'foo', password: 'foobar' });
 
     expect(user.username).toBe('foo');
 
   });
 
-  xit('should NOT authenticate if credientials DO NOT match', async () => {
+  it('should NOT authenticate if credientials DO NOT match', async () => {
 
     await createUser();
 
-    const user = await User.authenticate({ username: 'foo', password: 'badPass' });
+    const user = await User.authenticateBasic({ username: 'foo', password: 'badPass' });
 
     expect(user).toBeNull();
 
   });
 
 
-});
+  it('should authenticate a GOOD USER token', async () => {
 
+    const user = await createUser();
+    const token = user.generateToken();
+    const validUser = await User.authenticateToken(token);
+
+    expect(validUser.username).toBe(user.username);
+
+  });
+
+  it('should NOT authenticate a BAD USER token', async () => {
+
+
+    const token = 'thisisnotthetokenyourelookingformovealongnow';
+
+    await createUser()
+      .then(() => { User.authenticateToken(token); })
+      .catch(error => { expect(error).toBeDefined(); });
+
+  });
+
+
+
+
+
+
+
+
+});
