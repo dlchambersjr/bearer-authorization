@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.com/dlchambersjr/lab-18-bearer-authorization.svg?branch=master)](https://travis-ci.com/dlchambersjr/lab-18-bearer-authorization)
+
 # Lab-18 ```Bearer Authentication```
 
 ## Installation
