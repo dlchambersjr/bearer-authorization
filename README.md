@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.com/dlchambersjr/lab-18-bearer-authorization.svg?branch=master)](https://travis-ci.com/dlchambersjr/lab-18-bearer-authorization)
+[![Build Status](https://travis-ci.com/dlchambersjr/bearer-authorization.svg?branch=master)
 
 # Bearer Authentication
 
